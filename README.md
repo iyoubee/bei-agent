@@ -1,8 +1,11 @@
 # BEI Agent
 
-Shared [OpenCode](https://opencode.ai) agent definitions for the Backend Infrastructure (BEI) team.
+Shared [OpenCode](https://opencode.ai) agents and skills for the Backend Infrastructure (BEI) team.
 
-Agents are specialized AI assistants with custom prompts, model settings, and tool permissions. This repo lets the team share and collaborate on agents via Git.
+- **Agents** -- specialized AI assistants with custom prompts, model settings, and tool permissions.
+- **Skills** -- reusable instructions that agents can load on demand for specific workflows.
+
+This repo lets the team share and collaborate on both via Git.
 
 ## Prerequisites
 
@@ -17,18 +20,18 @@ cd bei-agent
 ./install.sh
 ```
 
-This creates symlinks from `~/.config/opencode/agents/` to the agent files in this repo. OpenCode picks them up automatically on next launch.
+This creates symlinks from `~/.config/opencode/` to the agent and skill files in this repo. OpenCode picks them up automatically on next launch.
 
 ## Update
 
-Pull the latest changes. Symlinks mean new or modified agents are available immediately.
+Pull the latest changes. Symlinks mean modified agents and skills are available immediately.
 
 ```bash
 cd bei-agent
 git pull
 ```
 
-If new agent files were added, re-run the install script to create their symlinks:
+If new agents or skills were added, re-run the install script to create their symlinks:
 
 ```bash
 ./install.sh
@@ -36,7 +39,7 @@ If new agent files were added, re-run the install script to create their symlink
 
 ## Uninstall
 
-Removes only the symlinks created by this repo. Your own agents are left untouched.
+Removes only the symlinks created by this repo. Your own agents and skills are left untouched.
 
 ```bash
 ./uninstall.sh
@@ -44,14 +47,30 @@ Removes only the symlinks created by this repo. Your own agents are left untouch
 
 ## Usage
 
-Once installed, agents are available globally in OpenCode:
+Once installed, everything is available globally in OpenCode:
 
 - **Primary agents** -- cycle with the `Tab` key
 - **Subagents** -- invoke with `@agent-name` in your message
+- **Skills** -- agents discover and load them automatically, or you can ask an agent to use a specific skill
+
+## Repo structure
+
+```
+bei-agent/
+├── agents/                    # One .md file per agent
+│   └── example-agent.md
+├── skills/                    # One directory per skill
+│   └── example-skill/
+│       └── SKILL.md
+├── install.sh
+├── uninstall.sh
+├── README.md
+└── CONTRIBUTING.md
+```
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add or modify agents.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add or modify agents and skills.
 
 ## License
 
