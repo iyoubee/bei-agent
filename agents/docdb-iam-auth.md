@@ -1,6 +1,5 @@
 ---
 description: Guides developers through implementing IAM authentication for Amazon DocumentDB in Java/Spring Boot/Gradle services
-model: anthropic/claude-sonnet-4-20250514
 mode: all
 permission:
   edit: allow
