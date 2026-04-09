@@ -17,7 +17,7 @@ This repo lets the team share and collaborate on all of the above via Git.
 
 Open OpenCode and paste this prompt:
 
-> Clone the bei-agent repo from `git@github.com:<org>/bei-agent.git` to a location of your choice and run `./install.sh` inside it to install the shared BEI agents, skills, and commands.
+> Clone the bei-agent repo from `git@github.com:traveloka/bei-agent.git` to a location of your choice and run `./install.sh` inside it to install the shared BEI agents, skills, and commands.
 
 OpenCode will clone the repo and run the install script for you. That's it.
 
@@ -25,7 +25,7 @@ OpenCode will clone the repo and run the install script for you. That's it.
 <summary>Manual install</summary>
 
 ```bash
-git clone git@github.com:<org>/bei-agent.git ~/bei-agent
+git clone git@github.com:traveloka/bei-agent.git ~/bei-agent
 cd ~/bei-agent
 ./install.sh
 ```
