@@ -39,17 +39,58 @@ If the developer does not provide a directory or repo name, ask them. Do not ass
 
 ## How you work
 
-1. **Analyze first.** Before making any changes, scan the developer's codebase to understand:
-   - Current MongoDB/DocumentDB driver dependencies in `build.gradle` or `*.gradle` files
+### Phase 1: Identify services
+
+After resolving the working directory, **identify all services in the repository that need migration** before making any changes.
+
+1. Read `settings.gradle` (or `settings.gradle.kts`) to list all modules/subprojects.
+2. For each module, check if it has MongoDB-related dependencies (`com.traveloka.common:mongo`, `mongo-java-driver`, `mongodb-driver`) in its `build.gradle`.
+3. Also check for MongoDB configuration files in the module's `./config` directory or the root `./config` directory.
+4. Present the list of services that need migration to the developer. For example:
+   ```
+   Found 3 services that use MongoDB:
+   1. payment-service
+   2. booking-service
+   3. notification-service
+
+   Which service would you like to migrate first?
+   ```
+5. Let the developer choose which service to migrate. Migrate **one service at a time**.
+
+### Phase 2: Create branch and migrate one service
+
+For each service the developer chooses:
+
+1. **Create a branch first** from the default branch (usually `main` or `master`):
+   ```bash
+   git checkout main && git pull
+   git checkout -b <service-name>/docdb-iam-auth
+   ```
+   The branch name MUST be `<service-name>/docdb-iam-auth`.
+
+2. **Analyze** the service's codebase:
+   - Current MongoDB/DocumentDB driver dependencies in the service's `build.gradle` and the root `build.gradle`
    - Current BEI Mongo Library version (`com.traveloka.common:mongo`)
    - MongoDB configuration files (typically in the `./config` directory, look for files containing
      `useIamAuth`, `MongoDBComponent`, mongo connection strings, or mongo-related properties)
-   - Java code using deprecated MongoDB driver APIs
+   - Java code using deprecated MongoDB driver APIs within the service module
    - Published library modules vs service modules in the repository
 
-2. **Propose changes.** Present a summary of what you found and what needs to change before modifying anything. Group the changes by the four migration steps below.
+3. **Propose changes.** Present a summary of what you found and what needs to change before modifying anything. Group the changes by the four migration steps below.
 
-3. **Apply changes step by step.** Work through each step, making targeted edits and verifying as you go.
+4. **Apply changes step by step.** Work through each migration step, making targeted edits and verifying as you go.
+
+5. **Commit all changes** on the `<service-name>/docdb-iam-auth` branch.
+
+6. **Create a PR** with the title: `[<service-name>] Implement DocDB IAM Auth`
+
+### Phase 3: Repeat for next service
+
+After completing one service, ask the developer if they want to migrate the next service. Go back to Phase 2 for each additional service. Each service gets its **own branch and its own PR**.
+
+### Root-level changes
+
+If changes are needed in the root directory (e.g., root `build.gradle`, root `config/`, shared build scripts), those changes MUST be included in **each service's branch**. Every service branch should be independently mergeable -- do not assume another service's branch was merged first.
 
 ## CRITICAL: Gradle lock file updates
 
@@ -63,14 +104,14 @@ If the developer does not provide a directory or repo name, ask them. Do not ass
 
 **Finding the latest BEI Mongo Library version:**
 
-Before choosing a version, check the latest 11.4.x release at:
-https://github.com/traveloka/bei-common-libraries-2025/releases
+Before choosing a version, check the latest 11.4.x tag at:
+https://github.com/traveloka/bei-common-libraries-2025/tags
 
-There are two major paths: 11.3.x and 11.4.x. **Always use the latest 11.4.x release** (minimum 11.4.1). Do not use 11.3.x -- it does not support IAM auth.
+Look at the **tags** (not releases). There are two major paths: 11.3.x and 11.4.x. **Always use the latest 11.4.x tag** (minimum 11.4.1). Do not use 11.3.x -- it does not support IAM auth.
 
 **Changes to `build.gradle`:**
 
-Add the new dependencies (replace `LATEST_11_4_X` with the actual latest 11.4.x version from the releases page):
+Add the new dependencies (replace `LATEST_11_4_X` with the actual latest 11.4.x version from the tags page):
 
 ```groovy
 dependencies {
@@ -166,13 +207,16 @@ If you are unsure which modules are published libraries vs services, ask the dev
 
 ## Workflow summary
 
-1. Scan the codebase and present findings.
-2. Apply Step 1 (dependencies) -> run `gradle-lock-update` skill.
-3. Apply Step 2 (config changes).
-4. Apply Step 3 (Java code fixes).
-5. Apply Step 4 (dependency cleanup for published libraries) -> run `gradle-lock-update` skill if any `.gradle` files changed.
-6. Verify the project builds: `./gradlew build`.
-7. Present a summary of all changes made.
+1. Resolve the repository (clone if needed).
+2. Identify all services that use MongoDB. Present the list.
+3. Developer picks a service. Create branch `<service-name>/docdb-iam-auth`.
+4. Apply Step 1 (dependencies) -> run `gradle-lock-update` skill.
+5. Apply Step 2 (config changes).
+6. Apply Step 3 (Java code fixes).
+7. Apply Step 4 (dependency cleanup for published libraries) -> run `gradle-lock-update` skill if any `.gradle` files changed.
+8. Verify the project builds: `./gradlew build`.
+9. Commit, push, and create PR titled `[<service-name>] Implement DocDB IAM Auth`.
+10. Ask developer if they want to migrate the next service. Repeat from step 3.
 
 ## Important warnings
 
