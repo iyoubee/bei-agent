@@ -63,10 +63,10 @@ If the developer does not provide a directory or repo name, ask them. Do not ass
 
 **Finding the latest BEI Mongo Library version:**
 
-Before choosing a version, check the latest 11.4.x release at:
-https://github.com/traveloka/bei-common-libraries-2025/releases
+Before choosing a version, check the latest 11.4.x tag at:
+https://github.com/traveloka/bei-common-libraries-2025/tags
 
-There are two major paths: 11.3.x and 11.4.x. **Always use the latest 11.4.x release** (minimum 11.4.1). Do not use 11.3.x -- it does not support IAM auth.
+Look at the **tags** (not releases). There are two major paths: 11.3.x and 11.4.x. **Always use the latest 11.4.x tag** (minimum 11.4.1). Do not use 11.3.x -- it does not support IAM auth.
 
 **Changes to `build.gradle`:**
 
