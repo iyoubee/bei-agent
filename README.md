@@ -1,11 +1,12 @@
 # BEI Agent
 
-Shared [OpenCode](https://opencode.ai) agents and skills for the Backend Infrastructure (BEI) team.
+Shared [OpenCode](https://opencode.ai) agents, skills, and commands for the Backend Infrastructure (BEI) team.
 
 - **Agents** -- specialized AI assistants with custom prompts, model settings, and tool permissions.
 - **Skills** -- reusable instructions that agents can load on demand for specific workflows.
+- **Commands** -- slash commands for common team operations.
 
-This repo lets the team share and collaborate on both via Git.
+This repo lets the team share and collaborate on all of the above via Git.
 
 ## Prerequisites
 
@@ -14,36 +15,45 @@ This repo lets the team share and collaborate on both via Git.
 
 ## Install
 
+Open OpenCode and paste this prompt:
+
+> Clone the bei-agent repo from `git@github.com:<org>/bei-agent.git` to a location of your choice and run `./install.sh` inside it to install the shared BEI agents, skills, and commands.
+
+OpenCode will clone the repo and run the install script for you. That's it.
+
+<details>
+<summary>Manual install</summary>
+
 ```bash
-git clone git@github.com:<org>/bei-agent.git
-cd bei-agent
+git clone git@github.com:<org>/bei-agent.git ~/bei-agent
+cd ~/bei-agent
 ./install.sh
 ```
 
-This creates symlinks from `~/.config/opencode/` to the agent and skill files in this repo. OpenCode picks them up automatically on next launch.
+</details>
+
+The install script:
+
+1. Symlinks agents, skills, and commands to `~/.config/opencode/`
+2. Writes a marker file at `~/.config/opencode/.bei-agent-path` so commands know where the repo lives
 
 ## Update
 
-Pull the latest changes. Symlinks mean modified agents and skills are available immediately.
+After install, use the built-in command:
 
-```bash
-cd bei-agent
-git pull
+```
+/bei-update
 ```
 
-If new agents or skills were added, re-run the install script to create their symlinks:
-
-```bash
-./install.sh
-```
+This pulls the latest changes and re-runs the install script to pick up any new agents, skills, or commands.
 
 ## Uninstall
 
-Removes only the symlinks created by this repo. Your own agents and skills are left untouched.
-
-```bash
-./uninstall.sh
 ```
+/bei-uninstall
+```
+
+Removes only the symlinks created by this repo. Your own agents, skills, and commands are left untouched.
 
 ## Usage
 
@@ -52,6 +62,7 @@ Once installed, everything is available globally in OpenCode:
 - **Primary agents** -- cycle with the `Tab` key
 - **Subagents** -- invoke with `@agent-name` in your message
 - **Skills** -- agents discover and load them automatically, or you can ask an agent to use a specific skill
+- **Commands** -- type `/bei-update` or `/bei-uninstall` in the TUI
 
 ## Repo structure
 
@@ -62,6 +73,9 @@ bei-agent/
 ├── skills/                    # One directory per skill
 │   └── example-skill/
 │       └── SKILL.md
+├── commands/                  # One .md file per command
+│   ├── bei-update.md
+│   └── bei-uninstall.md
 ├── install.sh
 ├── uninstall.sh
 ├── README.md
@@ -70,7 +84,7 @@ bei-agent/
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add or modify agents and skills.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add or modify agents, skills, and commands.
 
 ## License
 

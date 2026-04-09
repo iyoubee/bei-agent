@@ -1,6 +1,6 @@
 # Contributing to BEI Agent
 
-Thanks for contributing! Adding or improving agents and skills is straightforward.
+Thanks for contributing! Adding or improving agents, skills, and commands is straightforward.
 
 ---
 
@@ -180,14 +180,88 @@ Agents discover available skills automatically and load them on demand when they
 
 ---
 
+## Commands
+
+### How commands work
+
+Each `.md` file in the `commands/` directory becomes an OpenCode slash command. The filename (without `.md`) is the command name. For example, `bei-update.md` creates the `/bei-update` command.
+
+Commands are prompts that OpenCode executes when you type `/command-name` in the TUI.
+
+### Creating a new command
+
+1. Create a new branch:
+
+   ```bash
+   git checkout -b add-<command-name>
+   ```
+
+2. Create a new `.md` file in `commands/`:
+
+   ```bash
+   touch commands/<command-name>.md
+   ```
+
+3. Use the following template:
+
+   ```markdown
+   ---
+   description: Short description of what this command does
+   agent: build
+   ---
+
+   Instructions for what the agent should do when this command is invoked.
+
+   You can include shell output with:
+   !`some-command`
+
+   And accept arguments with $ARGUMENTS or positional $1, $2, etc.
+   ```
+
+4. Test locally -- the symlink from `./install.sh` means your changes are live immediately. Open OpenCode and try `/<command-name>`.
+
+5. Commit and open a PR:
+
+   ```bash
+   git add commands/<command-name>.md
+   git commit -m "feat: add /<command-name> command"
+   git push -u origin add-<command-name>
+   ```
+
+### Command file format
+
+#### Frontmatter fields
+
+| Field         | Description                                            |
+|---------------|--------------------------------------------------------|
+| `description` | Brief description shown in the command list            |
+| `agent`       | Which agent runs the command (default: current agent)  |
+| `model`       | Override the model for this command (optional)          |
+| `subtask`     | `true` to run as a subagent invocation (optional)      |
+
+#### Special placeholders
+
+| Placeholder   | Description                                    |
+|---------------|------------------------------------------------|
+| `$ARGUMENTS`  | All arguments passed after the command         |
+| `$1`, `$2`... | Individual positional arguments                |
+| `` !`cmd` ``  | Injects shell command output into the prompt   |
+
+### Naming conventions
+
+- Prefix BEI team commands with `bei-` to avoid conflicts
+- Lowercase, hyphen-separated: `bei-deploy`, `bei-lint`
+
+---
+
 ## General guidelines
 
-- Keep prompts focused -- one agent/skill, one purpose
+- Keep prompts focused -- one agent/skill/command, one purpose
 - Set restrictive permissions by default and loosen only when needed
 - Test before submitting a PR
 - Describe what you changed and why in the PR description
 
-## Modifying existing agents or skills
+## Modifying existing items
 
 1. Branch, edit the files, test locally, open a PR.
 2. Describe what you changed and why in the PR description.
@@ -196,3 +270,4 @@ Agents discover available skills automatically and load them on demand when they
 
 - [OpenCode Agents docs](https://opencode.ai/docs/agents/)
 - [OpenCode Skills docs](https://opencode.ai/docs/skills/)
+- [OpenCode Commands docs](https://opencode.ai/docs/commands/)
