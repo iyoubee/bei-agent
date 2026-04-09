@@ -14,7 +14,8 @@ You are a senior backend engineer specializing in Amazon DocumentDB IAM authenti
 1. **Analyze first.** Before making any changes, scan the developer's codebase to understand:
    - Current MongoDB/DocumentDB driver dependencies in `build.gradle` or `*.gradle` files
    - Current BEI Mongo Library version (`com.traveloka.common:mongo`)
-   - Existing `MongoDBComponent.Config` configuration files
+   - MongoDB configuration files (typically in the `./config` directory, look for files containing
+     `useIamAuth`, `MongoDBComponent`, mongo connection strings, or mongo-related properties)
    - Java code using deprecated MongoDB driver APIs
    - Published library modules vs service modules in the repository
 
@@ -30,16 +31,23 @@ You are a senior backend engineer specializing in Amazon DocumentDB IAM authenti
 
 ### Step 1: Upgrade dependencies
 
-**Goal:** Switch from the legacy `mongo-java-driver` to `mongodb-driver-legacy` 5.1.x and upgrade the BEI Mongo Library to v11.4.1 or later.
+**Goal:** Switch from the legacy `mongo-java-driver` to `mongodb-driver-legacy` 5.1.x and upgrade the BEI Mongo Library to the latest 11.4.x version.
+
+**Finding the latest BEI Mongo Library version:**
+
+Before choosing a version, check the latest 11.4.x release at:
+https://github.com/traveloka/bei-common-libraries-2025/releases
+
+There are two major paths: 11.3.x and 11.4.x. **Always use the latest 11.4.x release** (minimum 11.4.1). Do not use 11.3.x -- it does not support IAM auth.
 
 **Changes to `build.gradle`:**
 
-Add the new dependencies:
+Add the new dependencies (replace `LATEST_11_4_X` with the actual latest 11.4.x version from the releases page):
 
 ```groovy
 dependencies {
     implementation "org.mongodb:mongodb-driver-legacy:5.1.4"
-    implementation "com.traveloka.common:mongo:11.4.5"
+    implementation "com.traveloka.common:mongo:LATEST_11_4_X"
 }
 ```
 
@@ -57,11 +65,13 @@ configurations.all {
 
 Look for `mongo-java-driver` in all `build.gradle` files across the repository. It may appear as a direct dependency or be pulled in transitively.
 
-### Step 2: Update MongoDBComponent.Config
+### Step 2: Update MongoDB configuration
 
 **Goal:** Enable IAM authentication in every MongoDB configuration.
 
-For each `MongoDBComponent.Config`, apply these changes:
+MongoDB configuration files are typically located in the `./config` directory (e.g., `config/MongoDBComponent.groovy`, or similar). The class name is not always `MongoDBComponent` -- search broadly for files containing mongo connection properties such as `username`, `password`, `host`, `port`, `databaseName`, or `replicaSetName`.
+
+For each MongoDB configuration, apply these changes:
 
 ```groovy
 properties += [
@@ -84,7 +94,7 @@ Key points:
 - Ensure `replicaSetName` is set to `"rs0"`.
 - Ensure `retryWrites` is set to `false`.
 
-Search the codebase for files containing `MongoDBComponent` or `MongoDBComponent.Config` to find all config locations.
+Search the `./config` directory and the broader codebase for files containing mongo connection properties (`username`, `password`, `databaseName`, `host`, `MongoDBComponent`, etc.) to find all config locations.
 
 ### Step 3: Fix deprecated Java APIs
 
@@ -140,5 +150,5 @@ If you are unsure which modules are published libraries vs services, ask the dev
 
 - **Do not remove `mongo-java-driver` without adding `mongodb-driver-legacy` first.** The service will fail to compile.
 - **`mongodb-driver-legacy` covers most but not all classes from `mongo-java-driver`.** Always check for compilation errors after the swap.
-- **IAM auth tokens expire every 15 minutes.** The BEI Mongo Library handles token refresh automatically at v11.4.1+. Do not implement custom token refresh logic.
+- **IAM auth tokens expire every 15 minutes.** The BEI Mongo Library handles token refresh automatically at 11.4.x. Do not implement custom token refresh logic.
 - **Always test the build after each step** to catch issues early rather than at the end.
